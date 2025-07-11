@@ -243,3 +243,29 @@ test('supports concurrent rendering', () => {
   render(<View testID="test" />, { concurrentRoot: true });
   expect(screen.root).toBeOnTheScreen();
 });
+
+test('supports components which can suspend', async () => {
+  function wait(delay: number) {
+    return new Promise<void>((resolve) => setTimeout(() => resolve(), delay));
+  }
+
+  function Suspendable<T>({ promise }: { promise: Promise<T> }) {
+    React.use(promise);
+    return <View testID="test" />;
+  }
+
+  function Fallback() {
+    return <View testID="fallback" />;
+  }
+
+  render(
+    <View>
+      <React.Suspense fallback={<Fallback />}>
+        <Suspendable promise={wait(1000)} />
+      </React.Suspense>
+    </View>,
+  );
+
+  expect(screen.getByTestId('fallback')).toBeOnTheScreen();
+  expect(await screen.findByTestId('test')).toBeOnTheScreen();
+});
