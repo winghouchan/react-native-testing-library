@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
+import TestRenderer, { type ReactTestRenderer } from 'react-test-renderer';
 
 import type { RenderAPI } from '..';
-import { fireEvent, render, screen } from '..';
+import { fireEvent, render, screen, within } from '..';
 
 const PLACEHOLDER_FRESHNESS = 'Add custom freshness';
 const PLACEHOLDER_CHEF = 'Who inspected freshness?';
@@ -268,4 +269,40 @@ test('supports components which can suspend', async () => {
 
   expect(screen.getByTestId('fallback')).toBeOnTheScreen();
   expect(await screen.findByTestId('test')).toBeOnTheScreen();
+});
+
+test.only('react test renderer supports components which can suspend', async () => {
+  function wait(delay: number) {
+    return new Promise<void>((resolve) =>
+      setTimeout(() => {
+        resolve();
+      }, delay),
+    );
+  }
+
+  function Suspendable<T>({ promise }: { promise: Promise<T> }) {
+    React.use(promise);
+    return <View testID="test" />;
+  }
+
+  function Fallback() {
+    return <View testID="fallback" />;
+  }
+
+  let renderer: ReactTestRenderer;
+
+  await React.act(async () => {
+    renderer = TestRenderer.create(
+      <View>
+        <React.Suspense fallback={<Fallback />}>
+          <Suspendable promise={wait(1000)} />
+        </React.Suspense>
+      </View>,
+    );
+  });
+
+  let view = within(renderer!.root);
+
+  expect(view.getByTestId('fallback')).toBeDefined();
+  expect(await view.findByTestId('test')).toBeDefined();
 });
