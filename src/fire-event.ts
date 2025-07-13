@@ -105,7 +105,7 @@ type EventName = StringWithAutocomplete<
   | EventNameExtractor<ScrollViewProps>
 >;
 
-function fireEvent(element: ReactTestInstance, eventName: EventName, ...data: unknown[]) {
+async function fireEvent(element: ReactTestInstance, eventName: EventName, ...data: unknown[]) {
   if (!isElementMounted(element)) {
     return;
   }
@@ -118,7 +118,7 @@ function fireEvent(element: ReactTestInstance, eventName: EventName, ...data: un
   }
 
   let returnValue;
-  void act(() => {
+  await act(async () => {
     returnValue = handler(...data);
   });
 

@@ -25,8 +25,8 @@ function MultipleHostChildren() {
 }
 
 describe('getHostParent()', () => {
-  it('returns host parent for host component', () => {
-    render(
+  it('returns host parent for host component', async () => {
+    await render(
       <View testID="grandparent">
         <View testID="parent">
           <View testID="subject" />
@@ -48,8 +48,8 @@ describe('getHostParent()', () => {
     expect(getHostParent(null)).toBe(null);
   });
 
-  it('returns host parent for composite component', () => {
-    render(
+  it('returns host parent for composite component', async () => {
+    await render(
       <View testID="parent">
         <MultipleHostChildren />
         <View testID="subject" />
@@ -63,8 +63,8 @@ describe('getHostParent()', () => {
 });
 
 describe('getHostChildren()', () => {
-  it('returns host children for host component', () => {
-    render(
+  it('returns host children for host component', async () => {
+    await render(
       <View testID="grandparent">
         <View testID="parent">
           <View testID="subject" />
@@ -86,8 +86,8 @@ describe('getHostChildren()', () => {
     expect(getHostChildren(hostGrandparent)).toEqual([hostParent]);
   });
 
-  it('returns host children for composite component', () => {
-    render(
+  it('returns host children for composite component', async () => {
+    await render(
       <View testID="parent">
         <MultipleHostChildren />
         <View testID="subject" />
@@ -106,8 +106,8 @@ describe('getHostChildren()', () => {
 });
 
 describe('getHostSelves()', () => {
-  it('returns passed element for host components', () => {
-    render(
+  it('returns passed element for host components', async () => {
+    await render(
       <View testID="grandparent">
         <View testID="parent">
           <View testID="subject" />
@@ -129,8 +129,8 @@ describe('getHostSelves()', () => {
     expect(getHostSelves(hostGrandparent)).toEqual([hostGrandparent]);
   });
 
-  test('returns single host element for React Native composite components', () => {
-    render(
+  test('returns single host element for React Native composite components', async () => {
+    await render(
       <View testID="parent">
         <Text testID="text">Text</Text>
         <TextInput
@@ -153,8 +153,8 @@ describe('getHostSelves()', () => {
     expect(getHostSelves(compositeTextInputByPlaceholder)).toEqual([hostTextInput]);
   });
 
-  test('returns host children for custom composite components', () => {
-    render(
+  test('returns host children for custom composite components', async () => {
+    await render(
       <View testID="parent">
         <ZeroHostChildren />
         <MultipleHostChildren />
@@ -174,8 +174,8 @@ describe('getHostSelves()', () => {
 });
 
 describe('getHostSiblings()', () => {
-  it('returns host siblings for host component', () => {
-    render(
+  it('returns host siblings for host component', async () => {
+    await render(
       <View testID="grandparent">
         <View testID="parent">
           <View testID="siblingBefore" />
@@ -196,8 +196,8 @@ describe('getHostSiblings()', () => {
     ]);
   });
 
-  it('returns host siblings for composite component', () => {
-    render(
+  it('returns host siblings for composite component', async () => {
+    await render(
       <View testID="grandparent">
         <View testID="parent">
           <View testID="siblingBefore" />
@@ -219,8 +219,8 @@ describe('getHostSiblings()', () => {
 });
 
 describe('getUnsafeRootElement()', () => {
-  it('returns UNSAFE_root for mounted view', () => {
-    render(
+  it('returns UNSAFE_root for mounted view', async () => {
+    await render(
       <View>
         <View testID="view" />
       </View>,

@@ -14,7 +14,7 @@ if (!process?.env?.RNTL_SKIP_AUTO_CLEANUP) {
   if (typeof afterEach === 'function') {
     afterEach(async () => {
       await flushMicroTasks();
-      cleanup();
+      await cleanup();
     });
   }
 

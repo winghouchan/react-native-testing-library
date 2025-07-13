@@ -34,7 +34,7 @@ export interface RenderOptions {
   unstable_validateStringsRenderedWithinText?: boolean;
 }
 
-export type RenderResult = ReturnType<typeof render>;
+export type RenderResult = Awaited<ReturnType<typeof render>>;
 
 /**
  * Renders test component deeply using React Test Renderer and exposes helpers
@@ -44,7 +44,7 @@ export default function render<T>(component: React.ReactElement<T>, options: Ren
   return renderInternal(component, options);
 }
 
-export function renderInternal<T>(component: React.ReactElement<T>, options?: RenderOptions) {
+export async function renderInternal<T>(component: React.ReactElement<T>, options?: RenderOptions) {
   const {
     wrapper: Wrapper,
     concurrentRoot,
@@ -59,18 +59,18 @@ export function renderInternal<T>(component: React.ReactElement<T>, options?: Re
   };
 
   if (unstable_validateStringsRenderedWithinText) {
-    return renderWithStringValidation(component, {
+    return await renderWithStringValidation(component, {
       wrapper: Wrapper,
       ...testRendererOptions,
     });
   }
 
   const wrap = (element: React.ReactElement) => (Wrapper ? <Wrapper>{element}</Wrapper> : element);
-  const renderer = renderWithAct(wrap(component), testRendererOptions);
+  const renderer = await renderWithAct(wrap(component), testRendererOptions);
   return buildRenderResult(renderer, wrap);
 }
 
-function renderWithStringValidation<T>(
+async function renderWithStringValidation<T>(
   component: React.ReactElement<T>,
   options: Omit<RenderOptions, 'unstable_validateStringsRenderedWithinText'> = {},
 ) {
@@ -88,7 +88,7 @@ function renderWithStringValidation<T>(
     }
   };
 
-  const renderer: ReactTestRenderer = renderWithAct(wrap(component), testRendererOptions);
+  const renderer: ReactTestRenderer = await renderWithAct(wrap(component), testRendererOptions);
   validateStringsRenderedWithinText(renderer.toJSON());
 
   return buildRenderResult(renderer, wrap);
@@ -101,8 +101,8 @@ function buildRenderResult(
   const update = updateWithAct(renderer, wrap);
   const instance = renderer.root;
 
-  const unmount = () => {
-    void act(() => {
+  const unmount = async () => {
+    await act(async () => {
       renderer.unmount();
     });
   };
@@ -143,9 +143,9 @@ function updateWithAct(
   renderer: ReactTestRenderer,
   wrap: (innerElement: React.ReactElement) => React.ReactElement,
 ) {
-  return function (component: React.ReactElement) {
-    void act(() => {
-      renderer.update(wrap(component));
+  return async function (component: React.ReactElement) {
+    await act(async () => {
+      await renderer.update(wrap(component));
     });
   };
 }

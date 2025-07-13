@@ -4,10 +4,13 @@ type CleanUpFunction = () => void;
 
 const cleanupQueue = new Set<CleanUpFunction>();
 
-export default function cleanup() {
+export default async function cleanup() {
   clearRenderResult();
 
-  cleanupQueue.forEach((fn) => fn());
+  for (const fn of cleanupQueue.values()) {
+    await fn();
+  }
+
   cleanupQueue.clear();
 }
 

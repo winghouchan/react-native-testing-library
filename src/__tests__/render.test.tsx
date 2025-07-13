@@ -74,8 +74,8 @@ class Banana extends React.Component<any, { fresh: boolean }> {
   }
 }
 
-test('UNSAFE_getAllByType, UNSAFE_queryAllByType', () => {
-  render(<Banana />);
+test('UNSAFE_getAllByType, UNSAFE_queryAllByType', async () => {
+  await render(<Banana />);
   const [text, status, button] = screen.UNSAFE_getAllByType(Text);
   const InExistent = () => null;
 
@@ -88,8 +88,8 @@ test('UNSAFE_getAllByType, UNSAFE_queryAllByType', () => {
   expect(screen.UNSAFE_queryAllByType(InExistent)).toHaveLength(0);
 });
 
-test('UNSAFE_getByProps, UNSAFE_queryByProps', () => {
-  render(<Banana />);
+test('UNSAFE_getByProps, UNSAFE_queryByProps', async () => {
+  await render(<Banana />);
   const primaryType = screen.UNSAFE_getByProps({ type: 'primary' });
 
   expect(primaryType.props.children).toBe('Change freshness!');
@@ -99,8 +99,8 @@ test('UNSAFE_getByProps, UNSAFE_queryByProps', () => {
   expect(screen.UNSAFE_queryByProps({ type: 'inexistent' })).toBeNull();
 });
 
-test('UNSAFE_getAllByProp, UNSAFE_queryAllByProps', () => {
-  render(<Banana />);
+test('UNSAFE_getAllByProp, UNSAFE_queryAllByProps', async () => {
+  await render(<Banana />);
   const primaryTypes = screen.UNSAFE_getAllByProps({ type: 'primary' });
 
   expect(primaryTypes).toHaveLength(1);
@@ -110,51 +110,51 @@ test('UNSAFE_getAllByProp, UNSAFE_queryAllByProps', () => {
   expect(screen.UNSAFE_queryAllByProps({ type: 'inexistent' })).toHaveLength(0);
 });
 
-test('update', () => {
+test('update', async () => {
   const fn = jest.fn();
-  render(<Banana onUpdate={fn} />);
+  await render(<Banana onUpdate={fn} />);
 
-  fireEvent.press(screen.getByText('Change freshness!'));
+  await fireEvent.press(screen.getByText('Change freshness!'));
 
-  screen.update(<Banana onUpdate={fn} />);
-  screen.rerender(<Banana onUpdate={fn} />);
+  await screen.update(<Banana onUpdate={fn} />);
+  await screen.rerender(<Banana onUpdate={fn} />);
 
   expect(fn).toHaveBeenCalledTimes(3);
 });
 
-test('unmount', () => {
+test('unmount', async () => {
   const fn = jest.fn();
-  render(<Banana onUnmount={fn} />);
-  screen.unmount();
+  await render(<Banana onUnmount={fn} />);
+  await screen.unmount();
   expect(fn).toHaveBeenCalled();
 });
 
-test('unmount should handle cleanup functions', () => {
+test('unmount should handle cleanup functions', async () => {
   const cleanup = jest.fn();
   const Component = () => {
     React.useEffect(() => cleanup);
     return null;
   };
 
-  render(<Component />);
+  await render(<Component />);
 
-  screen.unmount();
+  await screen.unmount();
 
   expect(cleanup).toHaveBeenCalledTimes(1);
 });
 
-test('toJSON renders host output', () => {
-  render(<MyButton>press me</MyButton>);
+test('toJSON renders host output', async () => {
+  await render(<MyButton>press me</MyButton>);
   expect(screen.toJSON()).toMatchSnapshot();
 });
 
-test('renders options.wrapper around node', () => {
+test('renders options.wrapper around node', async () => {
   type WrapperComponentProps = { children: React.ReactNode };
   const WrapperComponent = ({ children }: WrapperComponentProps) => (
     <View testID="wrapper">{children}</View>
   );
 
-  render(<View testID="inner" />, {
+  await render(<View testID="inner" />, {
     wrapper: WrapperComponent,
   });
 
@@ -170,17 +170,17 @@ test('renders options.wrapper around node', () => {
   `);
 });
 
-test('renders options.wrapper around updated node', () => {
+test('renders options.wrapper around updated node', async () => {
   type WrapperComponentProps = { children: React.ReactNode };
   const WrapperComponent = ({ children }: WrapperComponentProps) => (
     <View testID="wrapper">{children}</View>
   );
 
-  render(<View testID="inner" />, {
+  await render(<View testID="inner" />, {
     wrapper: WrapperComponent,
   });
 
-  screen.rerender(<View testID="inner" accessibilityLabel="test" accessibilityHint="test" />);
+  await screen.rerender(<View testID="inner" accessibilityLabel="test" accessibilityHint="test" />);
 
   expect(screen.getByTestId('wrapper')).toBeTruthy();
   expect(screen.toJSON()).toMatchInlineSnapshot(`
@@ -196,24 +196,24 @@ test('renders options.wrapper around updated node', () => {
   `);
 });
 
-test('returns host root', () => {
-  render(<View testID="inner" />);
+test('returns host root', async () => {
+  await render(<View testID="inner" />);
 
   expect(screen.root).toBeDefined();
   expect(screen.root.type).toBe('View');
   expect(screen.root.props.testID).toBe('inner');
 });
 
-test('returns composite UNSAFE_root', () => {
-  render(<View testID="inner" />);
+test('returns composite UNSAFE_root', async () => {
+  await render(<View testID="inner" />);
 
   expect(screen.UNSAFE_root).toBeDefined();
   expect(screen.UNSAFE_root.type).toBe(View);
   expect(screen.UNSAFE_root.props.testID).toBe('inner');
 });
 
-test('container displays deprecation', () => {
-  render(<View testID="inner" />);
+test('container displays deprecation', async () => {
+  await render(<View testID="inner" />);
 
   expect(() => (screen as any).container).toThrowErrorMatchingInlineSnapshot(`
     "'container' property has been renamed to 'UNSAFE_root'.
@@ -222,25 +222,25 @@ test('container displays deprecation', () => {
   `);
 });
 
-test('RenderAPI type', () => {
-  render(<Banana />) as RenderAPI;
+test('RenderAPI type', async () => {
+  (await render(<Banana />)) as RenderAPI;
   expect(true).toBeTruthy();
 });
 
-test('returned output can be spread using rest operator', () => {
+test('returned output can be spread using rest operator', async () => {
   // Next line should not throw
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { rerender, ...rest } = render(<View testID="test" />);
+  const { rerender, ...rest } = await render(<View testID="test" />);
   expect(rest).toBeTruthy();
 });
 
-test('supports legacy rendering', () => {
-  render(<View testID="test" />, { concurrentRoot: false });
+test('supports legacy rendering', async () => {
+  await render(<View testID="test" />, { concurrentRoot: false });
   expect(screen.root).toBeOnTheScreen();
 });
 
-test('supports concurrent rendering', () => {
-  render(<View testID="test" />, { concurrentRoot: true });
+test('supports concurrent rendering', async () => {
+  await render(<View testID="test" />, { concurrentRoot: true });
   expect(screen.root).toBeOnTheScreen();
 });
 
@@ -258,10 +258,10 @@ test('supports components which can suspend', async () => {
     return <View testID="fallback" />;
   }
 
-  render(
+  await render(
     <View>
       <React.Suspense fallback={<Fallback />}>
-        <Suspendable promise={wait(1000)} />
+        <Suspendable promise={wait(10)} />
       </React.Suspense>
     </View>,
   );

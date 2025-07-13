@@ -8,8 +8,8 @@ function fakeMatcher() {
   return { pass: true, message: () => 'fake' };
 }
 
-test('checkHostElement allows host element', () => {
-  render(<View testID="view" />);
+test('checkHostElement allows host element', async () => {
+  await render(<View testID="view" />);
 
   expect(() => {
     // @ts-expect-error: intentionally passing wrong element shape
@@ -17,8 +17,8 @@ test('checkHostElement allows host element', () => {
   }).not.toThrow();
 });
 
-test('checkHostElement allows rejects composite element', () => {
-  render(<View testID="view" />);
+test('checkHostElement allows rejects composite element', async () => {
+  await render(<View testID="view" />);
 
   expect(() => {
     // @ts-expect-error: intentionally passing wrong element shape

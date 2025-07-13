@@ -3,7 +3,7 @@ import * as React from 'react';
 import { renderInternal } from './render';
 
 export type RenderHookResult<Result, Props> = {
-  rerender: (props: Props) => void;
+  rerender: (props: Props) => Promise<void>;
   result: React.MutableRefObject<Result>;
   unmount: () => void;
 };
@@ -28,10 +28,10 @@ export type RenderHookOptions<Props> = {
   concurrentRoot?: boolean;
 };
 
-export function renderHook<Result, Props>(
+export async function renderHook<Result, Props>(
   hookToRender: (props: Props) => Result,
   options?: RenderHookOptions<Props>,
-): RenderHookResult<Result, Props> {
+): Promise<RenderHookResult<Result, Props>> {
   const { initialProps, ...renderOptions } = options ?? {};
 
   const result: React.MutableRefObject<Result | null> = React.createRef();
@@ -46,14 +46,14 @@ export function renderHook<Result, Props>(
     return null;
   }
 
-  const { rerender: componentRerender, unmount } = renderInternal(
+  const { rerender: componentRerender, unmount } = await renderInternal(
     // @ts-expect-error since option can be undefined, initialProps can be undefined when it should'nt
     <TestComponent hookProps={initialProps} />,
     renderOptions,
   );
 
-  function rerender(hookProps: Props) {
-    return componentRerender(<TestComponent hookProps={hookProps} />);
+  async function rerender(hookProps: Props) {
+    return await componentRerender(<TestComponent hookProps={hookProps} />);
   }
 
   return {

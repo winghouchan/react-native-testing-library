@@ -14,13 +14,13 @@ class Test extends React.Component<{ onUnmount: () => void }> {
   }
 }
 
-test('cleanup', () => {
+test('cleanup', async () => {
   const fn = jest.fn();
 
-  render(<Test onUnmount={fn} />);
-  render(<Test onUnmount={fn} />);
+  await render(<Test onUnmount={fn} />);
+  await render(<Test onUnmount={fn} />);
   expect(fn).not.toHaveBeenCalled();
 
-  cleanup();
+  await cleanup();
   expect(fn).toHaveBeenCalledTimes(2);
 });
